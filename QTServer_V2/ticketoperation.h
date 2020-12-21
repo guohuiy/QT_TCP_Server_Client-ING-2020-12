@@ -19,6 +19,9 @@ public:
     ~TicketOperation();
 
     bool updateDatabase(QString sql);
+    bool deleteFlightMsgDatebase(unsigned int flightID);
+    bool addFlightMsgDatebase(unsigned int flightID,unsigned int ticketNum,unsigned int ticketPrice);
+    bool updateFlightMsgDatebase(unsigned int flightID,unsigned int ticketNum,unsigned int ticketPrice);
     bool openDatabase(QSqlDatabase &db);
     void closeDatabase(QSqlDatabase &db);
 

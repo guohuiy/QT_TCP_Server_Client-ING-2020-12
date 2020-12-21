@@ -138,6 +138,21 @@ bool ThreadService::searchAllFlight(QList<QString> &ticketListMsg)
     return ticketOp->ticketInfoList(ticketListMsg);
 }
 
+bool ThreadService::updateFlightMessage(unsigned int flightID,unsigned int ticketNum,unsigned int ticketPrice)
+{
+    ticketOp->updateFlightMsgDatebase(flightID,ticketNum,ticketPrice);
+}
+
+bool ThreadService::deleteFlightMessage(unsigned int flightID)
+{
+    return ticketOp->deleteFlightMsgDatebase(flightID);
+}
+
+bool ThreadService::addFlightMessage(unsigned int flightID, unsigned int ticketNum, unsigned int ticketPrice)
+{
+    return ticketOp->addFlightMsgDatebase(flightID,ticketNum,ticketPrice);
+}
+
 void ThreadService::servicePaintEvent(QVector<QString>& msg)
 {
     infoProcess->setInfoLock();

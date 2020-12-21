@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDialog>
 #include "threadservice.h"
 
 QT_BEGIN_NAMESPACE
@@ -37,6 +38,12 @@ private slots:
     void on_actionShow_triggered();
 
     void on_actionAbout_triggered();
+
+    void on_actionAdd_triggered();
+
+    void on_actionDelete_triggered();
+
+    void on_actionUpdate_triggered();
 
 private:
     Ui::MainWindow *ui;

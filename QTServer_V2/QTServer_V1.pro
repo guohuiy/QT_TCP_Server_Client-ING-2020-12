@@ -12,6 +12,7 @@ SOURCES += \
     basethread.cpp \
     infomation.cpp \
     infoprocess.cpp \
+    login.cpp \
     main.cpp \
     mainwindow.cpp \
     message.cpp \
@@ -26,6 +27,7 @@ HEADERS += \
     gloabalAPI.h \
     infomation.h \
     infoprocess.h \
+    login.h \
     mainwindow.h \
     message.h \
     threadoperation.h \
@@ -35,6 +37,7 @@ HEADERS += \
     ticketoperation.h
 
 FORMS += \
+    login.ui \
     mainwindow.ui
 
 # Default rules for deployment.

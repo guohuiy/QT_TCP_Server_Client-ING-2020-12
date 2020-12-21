@@ -1,9 +1,11 @@
 release/basethread.o
 release/infomation.o
 release/infoprocess.o
+release/login.o
 release/main.o
 release/mainwindow.o
 release/message.o
+release/threadoperation.o
 release/threadpool.o
 release/threadservice.o
 release/ticket.o
@@ -12,8 +14,10 @@ release/qrc_icon.o
 release/moc_basethread.o
 release/moc_infomation.o
 release/moc_infoprocess.o
+release/moc_login.o
 release/moc_mainwindow.o
 release/moc_message.o
+release/moc_threadoperation.o
 release/moc_threadpool.o
 release/moc_threadservice.o
 release/moc_ticket.o

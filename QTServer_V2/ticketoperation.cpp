@@ -24,11 +24,66 @@ bool TicketOperation::updateDatabase(QString sql)
     }
     QSqlQuery query;
     //更新
-    query.exec(sql);
+    int ret = query.exec(sql);
 
     closeDatabase(db);
 
-    return true;
+    return ret;
+}
+
+bool TicketOperation::deleteFlightMsgDatebase(unsigned int flightID)
+{
+    QSqlDatabase db=QSqlDatabase::addDatabase("QMYSQL");
+    //打开数据库
+    if(!openDatabase(db))
+    {
+        //QMessageBox::warning(this,"错误",db.lastError().text());
+        qDebug()<<"readTicketList 打开数据库异常:"+db.lastError().text();
+        return false;//数据库打开异常
+    }
+    QSqlQuery query;
+    //更新
+    int ret = query.exec(QString("delete from ticket  where flightID = %1;").arg(flightID));
+
+    closeDatabase(db);
+
+    return ret;
+}
+
+bool TicketOperation::addFlightMsgDatebase(unsigned int flightID,unsigned int ticketNum,unsigned int ticketPrice)
+{
+    QSqlDatabase db=QSqlDatabase::addDatabase("QMYSQL");
+    //打开数据库
+    if(!openDatabase(db))
+    {
+        qDebug()<<"readTicketList 打开数据库异常:"+db.lastError().text();
+        return false;//数据库打开异常
+    }
+    QSqlQuery query;
+    //更新
+    int ret = query.exec(QString("insert into ticket(flightID,ticketNum,ticketPrice) value(%1,%2,%3);").arg(flightID).arg(ticketNum).arg(ticketPrice));
+
+    closeDatabase(db);
+
+    return ret;
+}
+
+bool TicketOperation::updateFlightMsgDatebase(unsigned int flightID, unsigned int ticketNum, unsigned int ticketPrice)
+{
+    QSqlDatabase db=QSqlDatabase::addDatabase("QMYSQL");
+    //打开数据库
+    if(!openDatabase(db))
+    {
+        qDebug()<<"readTicketList 打开数据库异常:"+db.lastError().text();
+        return false;//数据库打开异常
+    }
+    QSqlQuery query;
+    //更新
+    int ret = query.exec(QString("update ticket set ticketNum = %1 ,ticketPrice = &2 where flightID = %3;").arg(ticketNum).arg(ticketPrice).arg(flightID));
+
+    closeDatabase(db);
+
+    return ret;
 }
 
 bool TicketOperation::openDatabase(QSqlDatabase &db)

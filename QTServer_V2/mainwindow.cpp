@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include <QtDebug>
 #include <QFormLayout>
-#include <QDialog>
 #include <QDialogButtonBox>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -12,9 +11,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->statusbar->hide();
 
     service=new ThreadService(this);
+    this->enableButton(false);
 }
 
 MainWindow::~MainWindow()
@@ -35,6 +34,9 @@ void MainWindow::enableButton(bool boolean)
     // 机票查询
     ui->actionConditionQuery->setEnabled(boolean);
     ui->actionAllQuery->setEnabled(boolean);
+    ui->actionAdd->setEnabled(boolean);
+    ui->actionDelete->setEnabled(boolean);
+    ui->actionUpdate->setEnabled(boolean);
 }
 
 void MainWindow::paintEvent(QPaintEvent *event)
@@ -158,5 +160,121 @@ void MainWindow::on_actionAbout_triggered()
     if (dialog.exec() == QDialog::Accepted)
     {
         this->displayInfo("查询信息成功\n");
+    }
+}
+
+void MainWindow::on_actionAdd_triggered()
+{
+    ui->textBrowser->append("Add Information...");
+
+    QDialog dialog(this);
+    QFormLayout form(&dialog);
+    dialog.setWindowTitle("增加航班信息(管理员)");
+    QList<QLineEdit*> fields;
+    QLineEdit *id = new QLineEdit(&dialog);
+    form.addRow(new QLabel("请输入航班号:"));
+    form.addRow(id);
+    QLineEdit *number = new QLineEdit(&dialog);
+    form.addRow(new QLabel("请输入票数:"));
+    form.addRow(number);
+    QLineEdit *price = new QLineEdit(&dialog);
+    form.addRow(new QLabel("请输入票价:"));
+    form.addRow(price);
+    fields << id;
+    fields << number;
+    fields << price;
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
+    form.addRow(&buttonBox);
+    QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        unsigned int flightID = id->text().toInt();
+        unsigned int ticketNum = number->text().toInt();
+        unsigned int ticketPrice = price->text().toInt();
+
+        if(service->addFlightMessage(flightID,ticketNum,ticketPrice))
+        {
+            this->displayInfo("添加航班信息成功！");
+        }
+        else
+        {
+            this->displayInfo("添加航班信息异常！");
+        }
+    }
+}
+
+void MainWindow::on_actionDelete_triggered()
+{
+    this->displayInfo("Delete Information...");
+
+    QDialog dialog(this);
+    QFormLayout form(&dialog);
+    dialog.setWindowTitle("删除航班信息(管理员)");
+    QList<QLineEdit*> fields;
+    QLineEdit *id = new QLineEdit(&dialog);
+    form.addRow(new QLabel("请输入航班号:"));
+    form.addRow(id);
+    fields << id;
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
+    form.addRow(&buttonBox);
+    QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        QString flightMsg;
+        unsigned int flightID = id->text().toInt();
+        if(service->searchFlightInfo(flightID,flightMsg))
+        {
+            this->displayInfo("删除该航班信息："+flightMsg);
+            if(service->deleteFlightMessage(flightID))this->displayInfo("删除航班信息成功!\n");
+            else this->displayInfo("删除航班信息异常!\n");
+        }
+        else this->displayInfo("删除航班信息不存在异常!\n"+flightMsg);
+    }
+}
+
+void MainWindow::on_actionUpdate_triggered()
+{
+    this->displayInfo("更新信息...");
+
+    QDialog dialog(this);
+    QFormLayout form(&dialog);
+    dialog.setWindowTitle("更新航班信息(管理员)");
+    QList<QLineEdit *> fields;
+    QLineEdit *id = new QLineEdit(&dialog);
+    form.addRow(new QLabel("请输入该航班的航班号:"));
+    form.addRow(id);
+    QLineEdit *number = new QLineEdit(&dialog);
+    form.addRow(new QLabel("请输入该航班的票数:"));
+    form.addRow(number);
+    QLineEdit *price = new QLineEdit(&dialog);
+    form.addRow(new QLabel("请输入该航班的票价:"));
+    form.addRow(price);
+    fields << id;
+    fields << number;
+    fields << price;
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
+    form.addRow(&buttonBox);
+    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+
+    if (dialog.exec() == QDialog::Accepted) {
+        int flightID = id->text().toInt();
+        int ticketNum = number->text().toInt();
+        int ticketPrice = price->text().toInt();
+        QString flightMsg;
+        if(service->searchFlightInfo(flightID,flightMsg))
+        {//有
+            this->displayInfo("更新该航班信息："+flightMsg);
+            if(service->updateFlightMessage(flightID,ticketNum,ticketPrice)) this->displayInfo("更新航班信息成功!\n");
+            else this->displayInfo("更新航班信息异常!\n"+flightMsg);
+        }
+        else
+        {//没有
+            if(service->addFlightMessage(flightID,ticketNum,ticketPrice))this->displayInfo("更新航班信息成功!\n");
+            else this->displayInfo("航班号："+QString::number(flightID)+" 更新信息异常!\n");
+        }
     }
 }

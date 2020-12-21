@@ -19,6 +19,9 @@ public:
     void serviceExit();
     bool searchFlightInfo(int value,QString& flightMsg);
     bool searchAllFlight(QList<QString> &ticketListMsg);
+    bool updateFlightMessage(unsigned int flightID,unsigned int ticketNum,unsigned int ticketPrice);
+    bool deleteFlightMessage(unsigned int flightID);
+    bool addFlightMessage(unsigned int flightID,unsigned int ticketNum,unsigned int ticketPrice);
     void servicePaintEvent(QVector<QString>& msg);
     void threadErr(QString s, int index);
     void serviceThread(Message &message);
