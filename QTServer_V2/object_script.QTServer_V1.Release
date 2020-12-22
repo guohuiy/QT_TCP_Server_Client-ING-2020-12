@@ -1,5 +1,4 @@
 release/basethread.o
-release/config.o
 release/infomation.o
 release/infoprocess.o
 release/login.o
@@ -13,7 +12,6 @@ release/ticket.o
 release/ticketoperation.o
 release/qrc_icon.o
 release/moc_basethread.o
-release/moc_config.o
 release/moc_infomation.o
 release/moc_infoprocess.o
 release/moc_login.o
