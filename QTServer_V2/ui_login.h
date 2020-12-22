@@ -58,6 +58,8 @@ public:
     {
         Login->setWindowTitle(QApplication::translate("Login", "Form", nullptr));
         label->setText(QApplication::translate("Login", "\345\224\256\347\245\250\347\263\273\347\273\237", nullptr));
+        lineEditUsername->setPlaceholderText(QApplication::translate("Login", "\347\256\241\347\220\206\345\221\230\347\224\250\346\210\267\345\220\215", nullptr));
+        lineEditPassword->setPlaceholderText(QApplication::translate("Login", "\345\257\206\347\240\201", nullptr));
         pushButton->setText(QApplication::translate("Login", "\347\231\273\345\275\225", nullptr));
     } // retranslateUi
 

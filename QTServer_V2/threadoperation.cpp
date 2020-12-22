@@ -2,17 +2,17 @@
 
 ThreadOperation::ThreadOperation(QObject *parent) : BaseThread(parent)
 {
-
+    config=new Config(this);
 }
 ThreadOperation::ThreadOperation(int buffIndex, int tid, unsigned long ipAddr, int connFd, int buffStatus)
     :BaseThread(buffIndex, tid, ipAddr, connFd, buffStatus)
 {
-
+    config=new Config(this);
 }
 
 ThreadOperation::~ThreadOperation()
 {
-
+    delete config;
 }
 
 //bool ThreadOperation::listenThread()

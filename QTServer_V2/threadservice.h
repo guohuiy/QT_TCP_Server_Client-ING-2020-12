@@ -30,6 +30,7 @@ public:
 public slots:
     void dealNewMsg();//和业务线程交互专用槽函数
 private:
+    Config* config;
     bool flag;//标记是否停止监听新用户
     ThreadPool* threadPool;
     QMutex threadPoolMutex;//threadPool的互斥操作

@@ -9,7 +9,7 @@
 #include <QtDebug>
 #include <QList>
 #include "message.h"
-#include "gloabalAPI.h"
+#include "config.h"
 
 class TicketOperation : public QObject
 {
@@ -36,6 +36,12 @@ public:
     int getNumRows();
     void setNumRows(int numRows);
 private:
+    const QString database="base";
+    const QString hostname="hostname";
+    const QString username="username";
+    const QString password="password";
+    const QString mydatabase="database";
+    Config* config;
     int numRows;
 
     QList<Ticket*> ticketList;

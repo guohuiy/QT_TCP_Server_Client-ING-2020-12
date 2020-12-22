@@ -1,4 +1,4 @@
-QT       += core gui network sql
+QT       += core gui network sql xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     basethread.cpp \
+    config.cpp \
     infomation.cpp \
     infoprocess.cpp \
     login.cpp \
@@ -24,6 +25,7 @@ SOURCES += \
 
 HEADERS += \
     basethread.h \
+    config.h \
     gloabalAPI.h \
     infomation.h \
     infoprocess.h \
@@ -47,3 +49,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     icon.qrc
+
+DISTFILES +=

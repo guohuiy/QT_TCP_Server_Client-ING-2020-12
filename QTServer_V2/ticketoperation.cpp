@@ -3,10 +3,12 @@
 TicketOperation::TicketOperation(QObject *parent) : QObject(parent)
 {
     numRows=0;
+    config=new Config(this);
 }
 
 TicketOperation::~TicketOperation()
 {
+    delete config;
     dataBaseMutex.lock();
     foreach(Ticket* p,ticketList) delete p;
     dataBaseMutex.unlock();
@@ -14,12 +16,12 @@ TicketOperation::~TicketOperation()
 
 bool TicketOperation::updateDatabase(QString sql)
 {
-    QSqlDatabase db=QSqlDatabase::addDatabase("QMYSQL");
+    QSqlDatabase db=QSqlDatabase::addDatabase(config->readConfig(database).toString());
     //打开数据库
     if(!openDatabase(db))
     {
         //QMessageBox::warning(this,"错误",db.lastError().text());
-        qDebug()<<"readTicketList 打开数据库异常";
+        qDebug()<<"updateDatabase 打开数据库异常";
         return false;//数据库打开异常
     }
     QSqlQuery query;
@@ -33,12 +35,12 @@ bool TicketOperation::updateDatabase(QString sql)
 
 bool TicketOperation::deleteFlightMsgDatebase(unsigned int flightID)
 {
-    QSqlDatabase db=QSqlDatabase::addDatabase("QMYSQL");
+    QSqlDatabase db=QSqlDatabase::addDatabase(config->readConfig(database).toString());
     //打开数据库
     if(!openDatabase(db))
     {
         //QMessageBox::warning(this,"错误",db.lastError().text());
-        qDebug()<<"readTicketList 打开数据库异常:"+db.lastError().text();
+        qDebug()<<"deleteFlightMsgDatebase 打开数据库异常:"+db.lastError().text();
         return false;//数据库打开异常
     }
     QSqlQuery query;
@@ -52,11 +54,11 @@ bool TicketOperation::deleteFlightMsgDatebase(unsigned int flightID)
 
 bool TicketOperation::addFlightMsgDatebase(unsigned int flightID,unsigned int ticketNum,unsigned int ticketPrice)
 {
-    QSqlDatabase db=QSqlDatabase::addDatabase("QMYSQL");
+    QSqlDatabase db=QSqlDatabase::addDatabase(config->readConfig(database).toString());
     //打开数据库
     if(!openDatabase(db))
     {
-        qDebug()<<"readTicketList 打开数据库异常:"+db.lastError().text();
+        qDebug()<<"addFlightMsgDatebase 打开数据库异常:"+db.lastError().text();
         return false;//数据库打开异常
     }
     QSqlQuery query;
@@ -70,11 +72,11 @@ bool TicketOperation::addFlightMsgDatebase(unsigned int flightID,unsigned int ti
 
 bool TicketOperation::updateFlightMsgDatebase(unsigned int flightID, unsigned int ticketNum, unsigned int ticketPrice)
 {
-    QSqlDatabase db=QSqlDatabase::addDatabase("QMYSQL");
+    QSqlDatabase db=QSqlDatabase::addDatabase(config->readConfig(database).toString());
     //打开数据库
     if(!openDatabase(db))
     {
-        qDebug()<<"readTicketList 打开数据库异常:"+db.lastError().text();
+        qDebug()<<"updateFlightMsgDatebase 打开数据库异常:"+db.lastError().text();
         return false;//数据库打开异常
     }
     QSqlQuery query;
@@ -89,10 +91,10 @@ bool TicketOperation::updateFlightMsgDatebase(unsigned int flightID, unsigned in
 bool TicketOperation::openDatabase(QSqlDatabase &db)
 {
     //连接数据库
-    db.setHostName("localhost");//数据库服务器IP
-    db.setUserName("root");//数据库用户名
-    db.setPassword("root");//设置密码
-    db.setDatabaseName("planeticket");//使用哪个数据库
+    db.setHostName(config->readConfig(hostname).toString());//数据库服务器IP
+    db.setUserName(config->readConfig(username).toString());//数据库用户名
+    db.setPassword(config->readConfig(password).toString());//设置密码
+    db.setDatabaseName(config->readConfig(mydatabase).toString());//使用哪个数据库
 
     return db.open();
 }
@@ -107,14 +109,12 @@ void TicketOperation::closeDatabase(QSqlDatabase &db)
 /* readTicketList:初始化ticketList数组 */
 void TicketOperation::readTicketList()
 {
-    qDebug()<<"[Debug:]TicketOperation::readTicketList：操作";
-
-    QSqlDatabase db=QSqlDatabase::addDatabase("QMYSQL");
+    QSqlDatabase db=QSqlDatabase::addDatabase(config->readConfig(database).toString());
     //打开数据库
     if(!openDatabase(db))
     {
         //QMessageBox::warning(this,"错误",db.lastError().text());
-        qDebug()<<"readTicketList 打开数据库异常";
+        qDebug()<<"[Debug]readTicketList 打开数据库异常";
         return;//数据库打开异常
     }
 
@@ -216,7 +216,7 @@ bool TicketOperation::searchAllFlight(QVector<Message*> &vMsg)
     dataBaseMutex.lock();
     for(int i=0;i<numRows;i++)
     {
-        vMsg.push_back(new Message(INQUIRE_SUCCEED,ticketList.at(i)->getFlightId(),ticketList.at(i)->getTicketNum(),ticketList.at(i)->getTicketPrice()));
+        vMsg.push_back(new Message(config->readConfig("INQUIRE_SUCCEED").toInt(),ticketList.at(i)->getFlightId(),ticketList.at(i)->getTicketNum(),ticketList.at(i)->getTicketPrice()));
     }
     if(vMsg.length()==numRows)
     {
@@ -239,7 +239,7 @@ bool TicketOperation::buyTicket(Message& msg)
             if(msg.getTicketNum()<=ticketList.at(i)->getTicketNum())
             {
                 //满足条件，出票
-                msg.setMsgType(BUY_SUCCEED);
+                msg.setMsgType(config->readConfig("BUY_SUCCEED").toInt());
                 msg.setTicketTotalPrice(msg.getTicketNum()*ticketList.at(i)->getTicketPrice());
                 ticketList.at(i)->setTicketNum(ticketList.at(i)->getTicketNum()-msg.getTicketNum());
                 //刷新数据库

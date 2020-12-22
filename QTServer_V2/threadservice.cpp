@@ -3,6 +3,7 @@
 ThreadService::ThreadService(QObject *parent) : QObject(parent)
 {
     flag=false;
+    config=new Config(this);
     threadPool=new ThreadPool(this);
     mServer=new QTcpServer(this);
     //下面要消户
@@ -14,6 +15,7 @@ ThreadService::ThreadService(QObject *parent) : QObject(parent)
 
 ThreadService::~ThreadService()
 {
+    delete config;
     delete infoProcess;
     delete threadPool;
     delete client;
@@ -33,7 +35,7 @@ bool ThreadService::listenThread()
     }
     else
     {
-        ret=mServer->listen(QHostAddress::Any,SERVER_PORT_NO);
+        ret=mServer->listen(QHostAddress::Any,config->readConfig("SERVER_PORT_NO").toInt());
     }
 
 

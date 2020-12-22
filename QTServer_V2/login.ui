@@ -41,6 +41,9 @@
      <height>41</height>
     </rect>
    </property>
+   <property name="placeholderText">
+    <string>管理员用户名</string>
+   </property>
   </widget>
   <widget class="QLineEdit" name="lineEditPassword">
    <property name="geometry">
@@ -53,6 +56,9 @@
    </property>
    <property name="echoMode">
     <enum>QLineEdit::Password</enum>
+   </property>
+   <property name="placeholderText">
+    <string>密码</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton">

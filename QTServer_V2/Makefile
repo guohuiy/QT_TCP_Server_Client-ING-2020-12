@@ -255,6 +255,7 @@ Makefile: QTServer_V1.pro C:/Qt/Qt5.12.10/5.12.10/mingw73_64/mkspecs/win32-g++/q
 		C:/Qt/Qt5.12.10/5.12.10/mingw73_64/lib/Qt5Gui.prl \
 		C:/Qt/Qt5.12.10/5.12.10/mingw73_64/lib/Qt5Network.prl \
 		C:/Qt/Qt5.12.10/5.12.10/mingw73_64/lib/Qt5Sql.prl \
+		C:/Qt/Qt5.12.10/5.12.10/mingw73_64/lib/Qt5Xml.prl \
 		C:/Qt/Qt5.12.10/5.12.10/mingw73_64/lib/Qt5Core.prl \
 		C:/Qt/Qt5.12.10/5.12.10/mingw73_64/lib/qtmain.prl
 	$(QMAKE) -o Makefile QTServer_V1.pro -spec win32-g++ "CONFIG+=qml_debug" "CONFIG+=qtquickcompiler" "CONFIG+=force_debug_info" "CONFIG+=separate_debug_info"
@@ -450,6 +451,7 @@ C:/Qt/Qt5.12.10/5.12.10/mingw73_64/lib/Qt5Widgets.prl:
 C:/Qt/Qt5.12.10/5.12.10/mingw73_64/lib/Qt5Gui.prl:
 C:/Qt/Qt5.12.10/5.12.10/mingw73_64/lib/Qt5Network.prl:
 C:/Qt/Qt5.12.10/5.12.10/mingw73_64/lib/Qt5Sql.prl:
+C:/Qt/Qt5.12.10/5.12.10/mingw73_64/lib/Qt5Xml.prl:
 C:/Qt/Qt5.12.10/5.12.10/mingw73_64/lib/Qt5Core.prl:
 C:/Qt/Qt5.12.10/5.12.10/mingw73_64/lib/qtmain.prl:
 qmake: FORCE

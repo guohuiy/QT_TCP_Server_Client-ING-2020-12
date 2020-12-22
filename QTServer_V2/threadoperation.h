@@ -17,7 +17,8 @@ public:
     ~ThreadOperation();
 
     void dealNewClientMsg(QTcpSocket& client,InfoProcess &infoProcess,TicketOperation& ticketOp);
-
+private:
+    Config* config;
 signals:
     void sendThreadErr(QString s, int index);
 };
