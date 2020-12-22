@@ -35,7 +35,7 @@ bool ThreadService::listenThread()
     }
     else
     {
-        ret=mServer->listen(QHostAddress::Any,config->readConfig("SERVER_PORT_NO").toInt());
+        ret=mServer->listen(QHostAddress::Any,8889);
     }
 
 
@@ -48,58 +48,63 @@ void ThreadService::incomingClientToThreadPool()
 {
     /* 分配线程缓冲区 */
     int threadToolIndex = threadPool->getFreeBuff();
+    qDebug()<<threadToolIndex;
     if(threadToolIndex < 0)
     {
         infoProcess->addInfo("没用空闲的线程缓冲区。\n");
-        //close(connFd);//断开连接
     }
     else
     {
-        threadPoolMutex.lock();
         //创建服务线程描述信息
-        opThread->setBuffIndex(threadToolIndex);
         opThread->setIpAddr(client->localAddress().toIPv4Address());
         opThread->setConnFd(client->peerPort());
-        opThread->setBuffStatus(1);
         //创建服务线程
-        QThread* qt=new QThread(this);
+        qt=new QThread(this);
         opThread->moveToThread(qt);
-        qt->start();
-
-        opThread->setTid(*(int*)qt->currentThreadId());
         threadPool->addThread(opThread,qt);
-        threadPoolMutex.unlock();
+
+        qDebug()<<"incomingClientToThreadPool::::qt->start();";
     }
 }
 
 void ThreadService::dealNewConn()
 {
+    qDebug()<<"有客户端来连接；\n";
     //接收处理消息
     client= mServer->nextPendingConnection();//返回下一个即将连接的套接字
+    qDebug()<<client->localAddress().toIPv4Address();
     /* 检测重复连接 */
     int pos=threadPool->checkConnection(client->localAddress().toIPv4Address());
     if(-1!=pos && isOffline(*client))//老客户已失联
     {
+        qDebug()<<"老客户重游；\n";
         //检测到已经断开
         infoProcess->addInfo(QString("重复连接：%s，旧连接已经关闭！\n").arg(client->peerAddress().toIPv4Address()));
-        threadPoolMutex.lock();
         threadPool->freeBuff(pos);
-        threadPoolMutex.unlock();
 
         incomingClientToThreadPool();
     }
     else if(pos==-1) //新客户
     {
+        qDebug()<<"新客户；\n";
+        opThread=new ThreadOperation;
+        qt=new QThread(this);
         incomingClientToThreadPool();
     }
     else//老客户
     {
+        qDebug()<<"老客户；\n";
+        opThread=new ThreadOperation;
         opThread=threadPool->searchThread(pos);
+        qt=threadPool->searchQThread(pos);
     }
 
     //服务线程要做的事
-    connect(client,&QTcpSocket::readyRead,this,&ThreadService::dealNewMsg);
+    connect(opThread,&ThreadOperation::sendThreadErr,this,&ThreadService::threadErr);
     connect(this,&ThreadService::informOpThreadDealMsg,opThread,&ThreadOperation::dealNewClientMsg);
+    connect(client,&QTcpSocket::readyRead,this,&ThreadService::dealNewMsg);
+
+
 
     //QHostAddress haddr = client->peerAddress();//获取IP
     //int port = client->peerPort();
@@ -157,28 +162,17 @@ bool ThreadService::addFlightMessage(unsigned int flightID, unsigned int ticketN
 
 void ThreadService::servicePaintEvent(QVector<QString>& msg)
 {
-    infoProcess->setInfoLock();
-    for(int i=0;i<InfoProcess::INFO_NUM;i++)
-    {
-        if(infoProcess->indexInfoIsOccupied(i))
-        {
-            msg.append(infoProcess->getIndexOccupiedInfoMsg(i));
-            infoProcess->freeInfo(i);
-        }
-    }
-    infoProcess->setInfoUnlock();
+    infoProcess->inforsOutput(msg);
 }
 
-void ThreadService::threadErr(QString s, int index)
+void ThreadService::threadErr(QString s, int tid)
 {
     /*获取空闲的界面输出信息缓冲区，如果没有空闲的,延迟一段时间后继续获取*/
-    QString msg = QString("线程号%1 发生致命错误 %2\n").arg(threadPool->getIndexThread(index)->getTid()).arg(s);
+    QString msg = QString("线程号%1 发生致命错误 %2\n").arg(tid).arg(s);
     infoProcess->addInfo(msg);
     //info_print(strmsg,serverwindow);
     /*释放线程使用的线程缓冲区*/
-    threadPoolMutex.lock();
-    threadPool->freeBuff(index);
-    threadPoolMutex.unlock();
+    threadPool->freeBuff(tid);
 }
 
 
@@ -192,6 +186,7 @@ bool ThreadService::isOffline(QTcpSocket &client)
 
 void ThreadService::dealNewMsg()
 {
-    connect(opThread,&ThreadOperation::sendThreadErr,this,&ThreadService::threadErr);
+    if(qt->isRunning()) return ;
+    qt->start();
     emit informOpThreadDealMsg(*client,*infoProcess,*ticketOp);
 }

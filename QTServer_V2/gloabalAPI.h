@@ -20,6 +20,9 @@ const int DELETE_TICKET=6;
 const int BUY_SUCCEED=255;
 const int BUY_FAILED=256;
 const int INQUIRE_SUCCEED=257;
-const int UNKNOWN_CODE=258;
+const int INQUIRE_FAILED=258;
+const int UNKNOWN_CODE=259;
+const int INQUIRE_ALL_SUCCEED=260;
+const int INQUIRE_ALL_FAILED=261;
 
 #endif // GLOABALAPI_H

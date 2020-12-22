@@ -6,7 +6,7 @@
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../../../myTicketSalesSystem_Version/QTServer_V3/threadoperation.h"
+#include "../threadoperation.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
@@ -22,7 +22,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_ThreadOperation_t {
     QByteArrayData data[5];
-    char stringdata0[39];
+    char stringdata0[37];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -35,10 +35,10 @@ QT_MOC_LITERAL(0, 0, 15), // "ThreadOperation"
 QT_MOC_LITERAL(1, 16, 13), // "sendThreadErr"
 QT_MOC_LITERAL(2, 30, 0), // ""
 QT_MOC_LITERAL(3, 31, 1), // "s"
-QT_MOC_LITERAL(4, 33, 5) // "index"
+QT_MOC_LITERAL(4, 33, 3) // "tid"
 
     },
-    "ThreadOperation\0sendThreadErr\0\0s\0index"
+    "ThreadOperation\0sendThreadErr\0\0s\0tid"
 };
 #undef QT_MOC_LITERAL
 
@@ -86,7 +86,7 @@ void ThreadOperation::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
 }
 
 QT_INIT_METAOBJECT const QMetaObject ThreadOperation::staticMetaObject = { {
-    &BaseThread::staticMetaObject,
+    &QObject::staticMetaObject,
     qt_meta_stringdata_ThreadOperation.data,
     qt_meta_data_ThreadOperation,
     qt_static_metacall,
@@ -105,12 +105,12 @@ void *ThreadOperation::qt_metacast(const char *_clname)
     if (!_clname) return nullptr;
     if (!strcmp(_clname, qt_meta_stringdata_ThreadOperation.stringdata0))
         return static_cast<void*>(this);
-    return BaseThread::qt_metacast(_clname);
+    return QObject::qt_metacast(_clname);
 }
 
 int ThreadOperation::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = BaseThread::qt_metacall(_c, _id, _a);
+    _id = QObject::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {

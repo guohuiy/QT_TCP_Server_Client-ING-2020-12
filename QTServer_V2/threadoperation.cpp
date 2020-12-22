@@ -1,13 +1,19 @@
 #include "threadoperation.h"
+#include <QThread>
 
-ThreadOperation::ThreadOperation(QObject *parent) : BaseThread(parent)
+ThreadOperation::ThreadOperation(QObject *parent) : QObject(parent)
 {
     config=new Config(this);
+    tid=0;            // 保存对应线程的线程号
+    ipAddr=0;  // 保存对应的客户机的IP地址
+    connFd=0;        // 该线程使用的连接套接字描述符
 }
 ThreadOperation::ThreadOperation(int buffIndex, int tid, unsigned long ipAddr, int connFd, int buffStatus)
-    :BaseThread(buffIndex, tid, ipAddr, connFd, buffStatus)
 {
     config=new Config(this);
+    this->tid=tid;
+    this->ipAddr=ipAddr;
+    this->connFd=connFd;
 }
 
 ThreadOperation::~ThreadOperation()
@@ -31,10 +37,9 @@ ThreadOperation::~ThreadOperation()
 
 void ThreadOperation::dealNewClientMsg(QTcpSocket& client,InfoProcess &infoProcess,TicketOperation& ticketOp)
 {
-    //BaseThread* opThread=(BaseThread*)p;
-    /*打印远端主机地址*/
-    QString msg=QString("新连接-->线程ID：%1, 连接ID：%2, 线程缓冲区索引号：%3, 远端地址：%s, 端口号：%5\n").arg(
-                this->getTid()).arg(this->getConnFd()).arg(this->getBuffIndex()).arg(client.peerAddress().toString()).arg(client.peerPort());
+    this->setTid(*(int*)QThread::currentThread());
+    QString msg=QString("新连接-->线程ID：%1, 连接ID：%2, 远端地址：%3, 端口号：%4\n").arg(
+                this->getTid()).arg(this->getConnFd()).arg(client.peerAddress().toString()).arg(client.peerPort());
     infoProcess.addInfo(msg);
 
     unsigned int msgType;
@@ -54,13 +59,13 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket& client,InfoProcess &infoProce
     {
         msg=QString("线程：%d 在连接：%d 接收出错。连接将关闭。\n").arg((unsigned short)this->getTid(), this->getConnFd());
         infoProcess.addInfo(msg);
-        emit sendThreadErr(msg, this->getBuffIndex());
+        emit sendThreadErr(msg, this->getTid());
     }
     else if(msgRet==0)
     {
         msg=QString("线程  %d  的连接( ID：%d ) 客户端已关闭。服务器端连接也将关闭。\n").arg(this->getTid(),this->getConnFd());
         infoProcess.addInfo(msg);
-        emit sendThreadErr(msg, this->getBuffIndex());
+        emit sendThreadErr(msg, this->getTid());
     }
 
     switch(message.getMsgType())
@@ -68,7 +73,7 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket& client,InfoProcess &infoProce
         case DISCONNECT:
             msg=QString("线程 %1  的连接(ID： %2 ) 客户端已关闭。服务器端连接也将关闭。\n").arg(this->getTid()).arg(this->getConnFd());
             infoProcess.addInfo(msg);
-            emit sendThreadErr(msg, this->getBuffIndex());
+            emit sendThreadErr(msg, this->getTid());
             break;
 
         case BUY_TICKET :
@@ -88,7 +93,7 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket& client,InfoProcess &infoProce
 
                 if(msgRet<0)
                 {
-                    emit sendThreadErr("购票发送数据异常\n", this->getBuffIndex());
+                    emit sendThreadErr("购票发送数据异常\n", this->getTid());
                 }
             }
             else
@@ -108,7 +113,7 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket& client,InfoProcess &infoProce
 
                 if(msgRet<0)
                 {
-                    emit sendThreadErr("购票发送数据出错\n", this->getBuffIndex());
+                    emit sendThreadErr("购票发送数据出错\n", this->getTid());
                 }
 
             }
@@ -132,7 +137,7 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket& client,InfoProcess &infoProce
 
                 if(msgRet<0)
                 {
-                    emit sendThreadErr("查询发送数据出错\n", this->getBuffIndex());
+                    emit sendThreadErr("查询发送数据出错\n", this->getTid());
                 }
             }
 
@@ -157,7 +162,7 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket& client,InfoProcess &infoProce
                     delete m;
                     if(msgRet<0)
                     {
-                        emit sendThreadErr("查询发送数据出错\n", this->getBuffIndex());
+                        emit sendThreadErr("查询发送数据出错\n", this->getTid());
                     }
                 }
             }
@@ -221,7 +226,38 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket& client,InfoProcess &infoProce
 
             if(msgRet<0)
             {
-                emit sendThreadErr("发送数据出错\n", this->getBuffIndex());
+                emit sendThreadErr("发送数据出错\n", this->getTid());
             }
     }
+
+}
+
+int ThreadOperation::getTid() const
+{
+    return tid;
+}
+
+void ThreadOperation::setTid(int value)
+{
+    tid = value;
+}
+
+unsigned long ThreadOperation::getIpAddr() const
+{
+    return ipAddr;
+}
+
+void ThreadOperation::setIpAddr(unsigned long value)
+{
+    ipAddr = value;
+}
+
+int ThreadOperation::getConnFd() const
+{
+    return connFd;
+}
+
+void ThreadOperation::setConnFd(int value)
+{
+    connFd = value;
 }

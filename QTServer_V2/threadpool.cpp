@@ -20,7 +20,7 @@ ThreadPool::~ThreadPool()
 
 int ThreadPool::getFreeBuff()
 {
-    buffMutex.lock();
+    qDebug()<<"getFreeBuff: threadBuff.length():"+QString::number(threadBuff.length());
     if(threadBuff.length()<THREAD_NUM)
     {
         return threadBuff.length();
@@ -29,16 +29,17 @@ int ThreadPool::getFreeBuff()
     return -1;
 }
 
-void ThreadPool::freeBuff(int index)
+void ThreadPool::freeBuff(int tid)
 {
     buffMutex.lock();
-    if(index<threadBuff.length() && threadBuff.at(index)->getBuffStatus()==threadBuff.at(index)->THREAD_OCCUPIED)
+    for(int i=0;i<threadBuff.length();++i)
     {
-        exitThread(index);
-        buffMutex.lock();
-        threadBuff.removeAt(index);
-        qThreadList.removeAt(index);
-        buffMutex.unlock();
+        if(threadBuff.at(i)->getTid()==tid)
+        {
+            exitThread(i);
+            threadBuff.removeAt(i);
+            qThreadList.removeAt(i);
+        }
     }
     buffMutex.unlock();
 }
@@ -48,15 +49,17 @@ void ThreadPool::freeBuff(int index)
 */
 int ThreadPool::checkConnection(unsigned long ipAddr)
 {
-    for(int i=0;i<THREAD_NUM;i++)
+    buffMutex.lock();
+    for(int i=0;i<threadBuff.length();i++)
     {
         /* 查找重复连接 */
         if(threadBuff.at(i)->getIpAddr()==ipAddr)
         {
+            buffMutex.unlock();
             return i;
         }
     }
-
+    buffMutex.unlock();
     return -1;//不存在该连接
 }
 
@@ -97,11 +100,16 @@ bool ThreadPool::addThread(ThreadOperation *bt,QThread* qt)
 
 ThreadOperation *ThreadPool::searchThread(unsigned int ipAddr, int port)
 {
+    buffMutex.lock();
     foreach(ThreadOperation* bt,threadBuff)
     {
         if(bt->getIpAddr()==ipAddr && bt->getConnFd()==port)
+        {
+            buffMutex.unlock();
             return bt;
+        }
     }
+    buffMutex.unlock();
     return nullptr;
 }
 
@@ -111,13 +119,8 @@ ThreadOperation *ThreadPool::searchThread(int pos)
     return threadBuff.at(pos);
 }
 
-void ThreadPool::setThreadPoolMutexLock()
+QThread *ThreadPool::searchQThread(int pos)
 {
-    buffMutex.lock();
+    if(pos<0 || pos>=qThreadList.length()) return nullptr;
+    return qThreadList.at(pos);
 }
-
-void ThreadPool::setThreadPoolMutexUnlock()
-{
-    buffMutex.unlock();
-}
-

@@ -35,6 +35,7 @@ private:
     ThreadPool* threadPool;
     QMutex threadPoolMutex;//threadPool的互斥操作
 
+    QThread* qt;
     ThreadOperation* opThread;
 
     TicketOperation* ticketOp;

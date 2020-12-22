@@ -16,7 +16,7 @@ public:
 
     //void initThreadBuff();
     int getFreeBuff();
-    void freeBuff(int index);
+    void freeBuff(int tid);
     int checkConnection(unsigned long ipAddr);
 
     ThreadOperation* getIndexThread(int index)const;
@@ -25,8 +25,7 @@ public:
     bool addThread(ThreadOperation* bt,QThread* qt);
     ThreadOperation* searchThread(unsigned int ipAddr,int port);
     ThreadOperation* searchThread(int pos);
-    void setThreadPoolMutexLock();
-    void setThreadPoolMutexUnlock();
+    QThread *searchQThread(int pos);
 private:
     /* 服务器端的线程缓冲区的最大数量 */
     const int THREAD_NUM=128;

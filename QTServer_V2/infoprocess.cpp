@@ -1,41 +1,20 @@
 #include "infoprocess.h"
+#include <QVector>
 
 InfoProcess::InfoProcess(QObject *parent) : QObject(parent)
 {
-    info=new Infomation[InfoProcess::INFO_NUM];
+
 }
 
 InfoProcess::~InfoProcess()
 {
-    delete[] info;
-}
-
-void InfoProcess::initInfo()
-{
-    infoMutex.lock();
-    for(int pos=InfoProcess::INFO_NUM;pos>0;pos--)
-    {
-        info[pos-1].setStatus(Infomation::INFO_FREED);
-        info[pos-1].setMessage("");
-    }
-    infoMutex.unlock();
 
 }
 
 int InfoProcess::getFreeInfo()
 {
-    int pos = 0;
-
     infoMutex.lock();
-    for(pos=0;pos<InfoProcess::INFO_NUM; pos++)
-    {
-        if(info[pos].getStatus()==Infomation::INFO_FREED)
-        {
-            infoMutex.unlock();
-            return pos;
-        }
-    }
-
+    if(info.length()<INFO_NUM) return info.length();
     infoMutex.unlock();
     return -1;
 }
@@ -43,36 +22,46 @@ int InfoProcess::getFreeInfo()
 void InfoProcess::freeInfo(int index)
 {
     setInfoLock();
-    if(info[index].getStatus()==info[index].INFO_OCCUPIED)
-    {
-        info[index].setStatus(info[index].INFO_FREED);
-        info[index].setMessage("");
-    }
+    Infomation* p=info.at(index);
+    info.removeAt(index);
+    delete p;
     setInfoUnlock();
 }
 
-void InfoProcess::addInfo(const QString &src)
+bool InfoProcess::addInfo(const QString &src)
 {
-    int pos=0;
-    while((pos=this->getFreeInfo())==-1)
-    {
-        _sleep(1);
-    }
     /* 添加消息 */
+
+    if(info.length()<INFO_NUM)
+    {
+        setInfoLock();
+        Infomation* inf=new Infomation(this);
+        inf->setMessage(src);
+        info.append(inf);
+        setInfoUnlock();
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+
+}
+
+void InfoProcess::inforsOutput(QVector<QString> &msg)
+{
     setInfoLock();
-    info[pos].setStatus(info[pos].INFO_OCCUPIED);
-    info[pos].setMessage(src);
+    foreach(Infomation* v,info)
+    {
+        msg.push_back(v->getMessage());
+    }
     setInfoUnlock();
 }
 
-bool InfoProcess::indexInfoIsOccupied(int index)
-{
-    return info[index].getStatus()==info[index].INFO_OCCUPIED;
-}
 
 QString InfoProcess::getIndexOccupiedInfoMsg(int index)
 {
-    return info[index].getMessage();
+    return info.at(index)->getMessage();
 }
 
 void InfoProcess::setInfoLock()

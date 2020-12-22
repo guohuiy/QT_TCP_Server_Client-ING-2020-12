@@ -18,7 +18,6 @@ public:
     QString getMessage();
     void setMessage(const QString &message);
 private:
-    int status;     /*INFO_OCCUPIED or INFO_FREED*/
     QString message;
 
 signals:

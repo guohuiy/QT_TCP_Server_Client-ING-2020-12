@@ -42,8 +42,8 @@ void MainWindow::on_actionConnect_triggered()
     this->displayInfo("正在连接服务器....\n");
 
     controller->connectServer();
-    this->displayInfo("连接服务器成功....\n");
-    this->enableButton(true);
+    //this->displayInfo("连接服务器成功....\n");
+    this->enableButton(false);
 }
 
 void MainWindow::on_actionDisconnct_triggered()
@@ -82,6 +82,7 @@ void MainWindow::on_actionBuyTicket_triggered()
     {
         QString flightOrd = ord->text();
         QString flightNum = num->text();
+        qDebug()<<flightNum<<"  "<<flightNum;
         /* 获取输入的航班号 */
         unsigned int flightID = flightOrd.toInt();
         unsigned int ticketNum= flightNum.toInt();

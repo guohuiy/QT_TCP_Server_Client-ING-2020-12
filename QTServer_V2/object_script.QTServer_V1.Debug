@@ -1,4 +1,4 @@
-debug/basethread.o
+debug/config.o
 debug/infomation.o
 debug/infoprocess.o
 debug/login.o
@@ -11,7 +11,7 @@ debug/threadservice.o
 debug/ticket.o
 debug/ticketoperation.o
 debug/qrc_icon.o
-debug/moc_basethread.o
+debug/moc_config.o
 debug/moc_infomation.o
 debug/moc_infoprocess.o
 debug/moc_login.o

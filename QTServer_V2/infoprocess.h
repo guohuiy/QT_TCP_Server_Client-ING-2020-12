@@ -14,12 +14,11 @@ public:
     explicit InfoProcess(QObject *parent = nullptr);
     ~InfoProcess();
 
-    void initInfo();
     int getFreeInfo();
     void freeInfo(int index);
-    void addInfo(const QString &src);
+    bool addInfo(const QString &src);
+    void inforsOutput(QVector<QString>& msg);
 
-    bool indexInfoIsOccupied(int index);//指定Infomatio是否被占用，占用返回true,否则false
     QString getIndexOccupiedInfoMsg(int index);//指定Infomation,返回它的message
 
     void setInfoLock();
@@ -28,7 +27,7 @@ public:
 private:
     QMutex infoMutex;
 
-    Infomation* info;
+    QList<Infomation*> info;
 
 signals:
 

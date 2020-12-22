@@ -20,7 +20,7 @@ Controller::~Controller()
 void Controller::connectServer()
 {
     connectflag=false;
-    client->connectToHost(QHostAddress(SERVER_IP_NO),SERVER_PORT_NO);
+    client->connectToHost(QHostAddress("192.168.199.136"),8889);
 
     connect(client,&QTcpSocket::connected,this,&Controller::isConnect);
 }
@@ -42,6 +42,7 @@ void Controller::exitServer()
 
 int Controller::buyTicket(unsigned int flightID,unsigned int ticketNum)
 {
+    qDebug()<<"buyTicket:::--------------";
     /* 购买机票 */
     Message message(this);
     message.setMsgType(BUY_TICKET);
@@ -52,7 +53,7 @@ int Controller::buyTicket(unsigned int flightID,unsigned int ticketNum)
     QDataStream in(bArr);
     in<<message.getMsgType()<<message.getFlightID()<<message.getTicketNum()<<message.getTicketTotalPrice();
 
-    qDebug()<<buff;
+    qDebug()<<"buff::"<<buff;
 
     return client->write(buff);
 }
