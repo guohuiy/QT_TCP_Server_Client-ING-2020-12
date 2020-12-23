@@ -27,6 +27,15 @@ public:
     void serviceThread(Message &message);
     bool isOffline(QTcpSocket &client);
 
+    QTcpSocket *getClient() const;
+    void setClient(QTcpSocket *value);
+
+    InfoProcess *getInfoProcess() const;
+    void setInfoProcess(InfoProcess *value);
+
+    TicketOperation *getTicketOp() const;
+    void setTicketOp(TicketOperation *value);
+
 public slots:
     void dealNewMsg();//和业务线程交互专用槽函数
 private:
@@ -44,7 +53,7 @@ private:
     QTcpSocket* client;
 
 signals:
-    void informOpThreadDealMsg(QTcpSocket &client,InfoProcess &infoProcess,TicketOperation& ticketOp);
+    void informOpThreadDealMsg(QTcpSocket *client,InfoProcess *infoProcess,TicketOperation *ticketOp);
 };
 
 #endif // THREADSERVICE_H

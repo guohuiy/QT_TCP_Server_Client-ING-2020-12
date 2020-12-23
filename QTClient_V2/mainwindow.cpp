@@ -74,15 +74,15 @@ void MainWindow::on_actionBuyTicket_triggered()
     fields << num;
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
     form.addRow(&buttonBox);
-    QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
-    QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+    QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
     /* 点击确认按钮 */
     if (dialog.exec() == QDialog::Accepted)
     {
         QString flightOrd = ord->text();
         QString flightNum = num->text();
-        qDebug()<<flightNum<<"  "<<flightNum;
+        qDebug()<<flightOrd<<"  "<<flightNum;
         /* 获取输入的航班号 */
         unsigned int flightID = flightOrd.toInt();
         unsigned int ticketNum= flightNum.toInt();

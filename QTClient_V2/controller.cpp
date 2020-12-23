@@ -48,14 +48,17 @@ int Controller::buyTicket(unsigned int flightID,unsigned int ticketNum)
     message.setMsgType(BUY_TICKET);
     message.setFlightID(flightID);
     message.setTicketNum(ticketNum);
-    char buff[1024]={0};
-    QByteArray bArr(buff);
-    QDataStream in(bArr);
+    //char buff[1024]={0};
+    QByteArray bArr;
+    QDataStream in(&bArr,QIODevice::ReadWrite);
+    in.setVersion(QDataStream::Qt_5_12);
+    //in<<(quint64)0;
     in<<message.getMsgType()<<message.getFlightID()<<message.getTicketNum()<<message.getTicketTotalPrice();
+    //in.device()->seek(0);
+    in<<(quint64)(bArr.size()-sizeof (quint64));
+    qDebug()<<bArr;
 
-    qDebug()<<"buff::"<<buff;
-
-    return client->write(buff);
+    return client->write(bArr);
 }
 
 void Controller::receiveMsg()

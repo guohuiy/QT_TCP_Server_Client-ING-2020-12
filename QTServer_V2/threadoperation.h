@@ -13,10 +13,10 @@ class ThreadOperation : public QObject
     Q_OBJECT
 public:
     explicit ThreadOperation(QObject *parent = nullptr);
-    ThreadOperation(int buffIndex,int tid,unsigned long ipAddr,int connFd,int buffStatus);
+    ThreadOperation(int tid,unsigned long ipAddr,int connFd);
     ~ThreadOperation();
 
-    void dealNewClientMsg(QTcpSocket& client,InfoProcess &infoProcess,TicketOperation& ticketOp);
+    void dealNewClientMsg(QTcpSocket *client,InfoProcess *infoProcess,TicketOperation *ticketOp);
     int getTid() const;
     void setTid(int value);
 

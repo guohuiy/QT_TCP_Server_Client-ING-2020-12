@@ -62,8 +62,6 @@ void ThreadService::incomingClientToThreadPool()
         qt=new QThread(this);
         opThread->moveToThread(qt);
         threadPool->addThread(opThread,qt);
-
-        qDebug()<<"incomingClientToThreadPool::::qt->start();";
     }
 }
 
@@ -187,6 +185,38 @@ bool ThreadService::isOffline(QTcpSocket &client)
 void ThreadService::dealNewMsg()
 {
     if(qt->isRunning()) return ;
+
     qt->start();
-    emit informOpThreadDealMsg(*client,*infoProcess,*ticketOp);
+    qDebug()<<"incomingClientToThreadPool::::qt->start();";
+    emit informOpThreadDealMsg(getClient(),getInfoProcess(),getTicketOp());
+}
+
+TicketOperation *ThreadService::getTicketOp() const
+{
+    return ticketOp;
+}
+
+void ThreadService::setTicketOp(TicketOperation *value)
+{
+    ticketOp = value;
+}
+
+InfoProcess *ThreadService::getInfoProcess() const
+{
+    return infoProcess;
+}
+
+void ThreadService::setInfoProcess(InfoProcess *value)
+{
+    infoProcess = value;
+}
+
+QTcpSocket *ThreadService::getClient() const
+{
+    return client;
+}
+
+void ThreadService::setClient(QTcpSocket *value)
+{
+    client = value;
 }
