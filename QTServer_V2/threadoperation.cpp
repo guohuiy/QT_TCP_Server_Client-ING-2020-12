@@ -7,9 +7,9 @@ ThreadOperation::ThreadOperation(QObject *parent) : QObject(parent)
     myServer=new QTcpServer(this);
     myClient=new QTcpSocket(this);
     message=new Message(this);
-    tid=0;            // 保存对应线程的线程号
-    ipAddr=0;  // 保存对应的客户机的IP地址
-    connFd=0;        // 该线程使用的连接套接字描述符
+    tid=0;
+    ipAddr=0;
+    connFd=0;
 }
 ThreadOperation::ThreadOperation(int tid, unsigned long ipAddr, int connFd)
 {

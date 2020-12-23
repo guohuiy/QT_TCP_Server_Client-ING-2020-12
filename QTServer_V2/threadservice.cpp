@@ -32,6 +32,7 @@ void ThreadService::listenThread()
 
     if(mServer->listen(QHostAddress::Any,8889))
     {
+        qDebug()<<"[debug]ThreadService::listenThread";
         connect(mServer,&QTcpServer::newConnection,this,&ThreadService::dealNewConn);
         //return true;
     }
@@ -47,7 +48,7 @@ void ThreadService::dealNewConn()
     client= mServer->nextPendingConnection();//返回下一个即将连接的套接字
     qDebug()<<"[]DEBUG]ThreadService::dealNewConn"<<client->localAddress().toIPv4Address();
     /* 检测重复连接 */
-    int pos=threadPool->checkConnection(client->localAddress().toIPv4Address());
+    int pos=threadPool->checkConnection(client->localAddress().toIPv4Address(),client->localPort());
     if(-1!=pos && isOffline(*client))//老客户已失联
     {
         qDebug()<<"老客户重游；\n";
@@ -66,7 +67,7 @@ void ThreadService::dealNewConn()
         qt=new QThread(this);
         //创建服务线程描述信息
         opThread->setIpAddr(client->localAddress().toIPv4Address());
-        opThread->setConnFd(client->peerPort());
+        opThread->setConnFd(client->localPort());
         opThread->moveToThread(qt);
         threadPool->addThread(opThread,qt);
         clientList.append(client);
@@ -80,7 +81,7 @@ void ThreadService::dealNewConn()
         qt=new QThread(this);
         opThread->setMyClient(client);
         opThread->setIpAddr(client->localAddress().toIPv4Address());
-        opThread->setConnFd(client->peerPort());
+        opThread->setConnFd(client->localPort());
         opThread->moveToThread(qt);
         threadPool->addThread(opThread,qt);
         qt->start();
@@ -97,12 +98,9 @@ void ThreadService::dealNewConn()
     //服务线程要做的事
     connect(opThread,&ThreadOperation::reciveMessage,this,&ThreadService::dealNewClientMsg);
     connect(this,&ThreadService::informOpThreadDealMsg,opThread,&ThreadOperation::listenThread);
-    //connect(client,&QTcpSocket::readyRead,this,&ThreadService::dealNewMsg);
-    //connect(opThread,&ThreadOperation::sendOver,this,&ThreadService::dealNewOverMsg);
-
     emit informOpThreadDealMsg();
     //QHostAddress haddr = client->peerAddress();//获取IP
-    //int port = client->peerPort();
+    //int port = client->localPort();//客户端随机端口号
     //qDebug()<<QHostAddress("192.168.1.1").toIPv4Address();//int32
     //qDebug()<<QHostAddress(3232235777).toString();//"a.b.b.c"
 
@@ -211,41 +209,10 @@ void ThreadService::setInfoProcess(InfoProcess *value)
 
 void ThreadService::dealNewClientMsg(QTcpSocket *client,Message *message,int tid)//QTcpSocket *client,InfoProcess *infoProcess,TicketOperation *ticketOp
 {
-//    qDebug()<<"dealNewClientMsg::线程"<<this->getTid();
-//    QString msg=QString("客户端新消息-->线程ID：%1, 连接ID：%2, 远端地址：%3, 端口号：%4\n").arg(
-//                this->getTid()).arg(this->getConnFd()).arg(client->peerAddress().toString()).arg(client->peerPort());
-//    infoProcess->addInfo(msg);
-
-//    unsigned int msgType;
-//    unsigned int flightID;
-//    unsigned int ticketNum;
-//    unsigned int ticketTotalPrice;
-
-//    QDataStream in(client);
-//    in.setVersion(QDataStream::Qt_5_12);
-
-//    in >> msgType>>flightID>>ticketNum>>ticketTotalPrice;
-//    Message message(msgType,flightID,ticketNum,ticketTotalPrice);
-
-//    qDebug()<<"dealNewClientMsg：航班："<<flightID;
     //qDebug()<<"客户端查询"<<message->getMsgType()<<flightID<<ticketNum<<ticketTotalPrice;
     QString msg;
     int msgRet=0;
-//    /* 接收出错 */
-//    if(msgRet==-1)
-//    {
-//        qDebug()<<"dealNewClientMsg：消息读取错误";
-//        msg=QString("线程：%d 在连接：%d 接收出错。连接将关闭。\n").arg((unsigned short)this->getTid(), this->getConnFd());
-//        infoProcess->addInfo(msg);
-//        emit sendThreadErr(msg, this->getTid());
-//    }
-//    else if(msgRet==0)
-//    {
-//        qDebug()<<"dealNewClientMsg：客户端关闭";
-//        msg=QString("线程  %d  的连接( ID：%d ) 客户端已关闭。服务器端连接也将关闭。\n").arg(this->getTid(),this->getConnFd());
-//        infoProcess->addInfo(msg);
-//        emit sendThreadErr(msg, this->getTid());
-//    }
+
     qDebug()<<message->getMsgType()<<message->getFlightID()<<message->getTicketNum()<<message->getTicketTotalPrice();
     switch(message->getMsgType())
     {

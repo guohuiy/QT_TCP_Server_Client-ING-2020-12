@@ -17,7 +17,7 @@ public:
     //void initThreadBuff();
     int getFreeBuff();
     void freeBuff(int tid);
-    int checkConnection(unsigned long ipAddr);
+    int checkConnection(unsigned long ipAddr,unsigned int port);
 
     ThreadOperation* getIndexThread(int index)const;
     void exitThread(int index);

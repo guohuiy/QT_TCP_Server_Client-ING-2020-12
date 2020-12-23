@@ -10,8 +10,6 @@ CONFIG += c++11
 
 SOURCES += \
     controller.cpp \
-    infoprocessor.cpp \
-    information.cpp \
     main.cpp \
     mainwindow.cpp \
     message.cpp \
@@ -19,8 +17,6 @@ SOURCES += \
 
 HEADERS += \
     controller.h \
-    infoprocessor.h \
-    information.h \
     mainwindow.h \
     message.h \
     msginfo.h \

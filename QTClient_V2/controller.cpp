@@ -33,11 +33,22 @@ void Controller::isConnect()
 void Controller::disconnectServer()
 {
     if(!connectflag) return ;
-    client->disconnectFromHost();
+    //client->disconnectFromHost();
     QByteArray bArr;
     QDataStream in(&bArr,QIODevice::ReadWrite);
     in.setVersion(QDataStream::Qt_5_12);
     in<<DISCONNECT<<0<<0<<0;
+    //in<<(quint64)(bArr.size()-sizeof (quint64));
+    client->write(bArr);
+
+    if(client->isValid())
+    {
+        client->abort();
+        QTcpSocket* pQTcpSocket = static_cast<QTcpSocket*>(sender());
+        qDebug()<<"receive disconnect!"<<pQTcpSocket;
+        pQTcpSocket->deleteLater();
+    }
+    connectflag=false;
 }
 
 void Controller::exitServer()
@@ -104,7 +115,7 @@ void Controller::receiveMsg()
 int Controller::conditionQuery(unsigned int flightID)
 {
     if(!connectflag) return -1;
-    qDebug()<<"查询航班："<<flightID;
+    qDebug()<<client->peerAddress().toIPv4Address()<<":"<<client->localAddress()<<client->localPort()<<"查询航班："<<flightID;
     QByteArray bArr;
     QDataStream in(&bArr,QIODevice::ReadWrite);
     in.setVersion(QDataStream::Qt_5_12);
@@ -126,5 +137,15 @@ int Controller::allQuery()
     int ret=client->write(bArr);
             qDebug()<<"发送信息返回值="<<ret;
     return ret;
+}
+
+bool Controller::getConnectflag() const
+{
+    return connectflag;
+}
+
+void Controller::setConnectflag(bool value)
+{
+    connectflag = value;
 }
 

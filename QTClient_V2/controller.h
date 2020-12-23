@@ -21,6 +21,9 @@ public:
     int conditionQuery(unsigned int flightID);
     int allQuery();
 
+    bool getConnectflag() const;
+    void setConnectflag(bool value);
+
 private:
     QTcpSocket* client;
     bool connectflag;

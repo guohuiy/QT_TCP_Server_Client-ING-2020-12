@@ -13,6 +13,26 @@ MainWindow::MainWindow(QWidget *parent)
     controller=new Controller(this);
 
     this->enableButton(true);
+
+    connect(controller,&Controller::sendQueryFailed,this,[this](){
+        this->displayInfo("航班查询异常！！");
+    });
+    connect(controller,&Controller::sendQuerySuccess,this,[this](int x,int y,int z,int m){
+        this->displayInfo(QString("查询到航班:%1 数量%2 价格%3").arg(y).arg(z).arg(m));
+        qDebug()<<"[DEBUG]MainWindow::on_actionConditionQuery_triggered";
+    });
+    connect(controller,&Controller::sendErr,this,[this](){
+        this->displayInfo("数据异常...");
+    });
+    connect(controller,&Controller::sendQueryAllFailed,this,[this](){
+        this->displayInfo("查询所有航班信息异常！！");
+    });
+    connect(controller,&Controller::sendQueryAllSuccess,this,[this](int x,int y,int z,int m){
+        this->displayInfo(QString("查询到航班:%1 数量%2 价格%3").arg(y).arg(z).arg(m));
+    });
+    connect(controller,&Controller::sendErr,this,[this](){
+        this->displayInfo("数据异常...");
+    });
 }
 
 MainWindow::~MainWindow()
@@ -23,7 +43,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::displayInfo(QString msg)
 {
-    ui->textBrowser->append(msg);
+    ui->textBrowser->insertPlainText(msg+"\n");
+
+    ui->textBrowser->moveCursor(QTextCursor::Start);
 }
 
 void MainWindow::enableButton(bool b)
@@ -39,27 +61,27 @@ void MainWindow::enableButton(bool b)
 
 void MainWindow::on_actionConnect_triggered()
 {
-    this->displayInfo("正在连接服务器....\n");
-
+    this->displayInfo("正在连接服务器....");
+    //if(controller->getConnectflag()==false)
     controller->connectServer();
-    //this->displayInfo("连接服务器成功....\n");
+    //this->displayInfo("连接服务器成功....");
     this->enableButton(false);
 }
 
 void MainWindow::on_actionDisconnct_triggered()
 {
-    this->displayInfo("正在断开服务器....\n");
+    this->displayInfo("正在断开服务器....");
 
     controller->disconnectServer();
 
-    this->displayInfo("断开服务器成功....\n");
+    this->displayInfo("断开服务器成功....");
 
-    this->enableButton(false);
+    this->enableButton(true);
 }
 
 void MainWindow::on_actionBuyTicket_triggered()
 {
-    this->displayInfo("准备买票....\n");
+    this->displayInfo("准备买票....");
     QDialog dialog(this);
     QFormLayout form(&dialog);
     dialog.setWindowTitle("机票购买");
@@ -89,16 +111,16 @@ void MainWindow::on_actionBuyTicket_triggered()
 
         if(-1==controller->buyTicket(flightID,ticketNum))
         {
-            this->displayInfo("购票异常...\n");
+            this->displayInfo("购票异常...");
         }
         connect(controller,&Controller::sendBuyFailure,this,[this](){
-            this->displayInfo("购票异常...\n");
+            this->displayInfo("购票异常...");
         });
         connect(controller,&Controller::sendBuySuccess,this,[this](int x,int y,int z, int k){
-            this->displayInfo(QString("航班%1:购票成功，总票价：%2...\n").arg(y).arg(k));
+            this->displayInfo(QString("航班%1:购票成功，总票价：%2...").arg(y).arg(k));
         });
         connect(controller,&Controller::sendErr,this,[this](){
-            this->displayInfo("数据异常...\n");
+            this->displayInfo("数据异常...");
         });
     }
 }
@@ -111,7 +133,7 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionConditionQuery_triggered()
 {
-    this->displayInfo("Inquire One\n");
+    this->displayInfo("Inquire One");
     QDialog dialog(this);
     QFormLayout form(&dialog);
     dialog.setWindowTitle("机票查询");
@@ -130,26 +152,19 @@ void MainWindow::on_actionConditionQuery_triggered()
     {
         int flightID = ord->text().toInt();
 
-        if(controller->conditionQuery(flightID)==-1) {
-            displayInfo(ord->text()+"航班查询异常！！");
+        if(controller->conditionQuery(flightID)==-1)
+        {
+            this->displayInfo(ord->text()+"航班查询异常！！");
             return ;
         }
 
-        connect(controller,&Controller::sendQueryFailed,this,[this](){
-            this->displayInfo("航班查询异常！！");
-        });
-        connect(controller,&Controller::sendQuerySuccess,this,[this](int x,int y,int z,int m){
-            this->displayInfo(QString("查询到航班:%1 数量%2 价格%3").arg(y).arg(z).arg(m));
-        });
-        connect(controller,&Controller::sendErr,this,[this](){
-            this->displayInfo("数据异常...\n");
-        });
+
     }
 }
 
 void MainWindow::on_actionAllQuery_triggered()
 {
-    this->displayInfo("Inquire All....\n");
+    this->displayInfo("Inquire All....");
 
     if(controller->allQuery()==-1)
     {
@@ -157,15 +172,7 @@ void MainWindow::on_actionAllQuery_triggered()
         return ;
     }
 
-    connect(controller,&Controller::sendQueryAllFailed,this,[this](){
-        this->displayInfo("查询所有航班信息异常！！");
-    });
-    connect(controller,&Controller::sendQueryAllSuccess,this,[this](int x,int y,int z,int m){
-        this->displayInfo(QString("查询到航班:%1 数量%2 价格%3").arg(y).arg(z).arg(m));
-    });
-    connect(controller,&Controller::sendErr,this,[this](){
-        this->displayInfo("数据异常...\n");
-    });
+
 }
 
 void MainWindow::on_actionShow_triggered()
@@ -185,7 +192,7 @@ void MainWindow::on_actionShow_triggered()
     QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
     if (dialog.exec() == QDialog::Accepted)
     {
-        displayInfo("查询帮助显示信息成功\n");
+        displayInfo("查询帮助显示信息成功");
     }
 }
 
@@ -205,6 +212,6 @@ void MainWindow::on_actionAbout_triggered()
     QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
     if (dialog.exec() == QDialog::Accepted)
     {
-        this->displayInfo("查询帮助关于信息成功\n");
+        this->displayInfo("查询帮助关于信息成功");
     }
 }

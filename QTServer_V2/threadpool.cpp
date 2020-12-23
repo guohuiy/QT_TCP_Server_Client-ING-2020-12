@@ -47,13 +47,13 @@ void ThreadPool::freeBuff(int tid)
 /*
  * 检查线程缓冲区中是否有重复连接，如果是重复连接返回位置，否则返回-1
 */
-int ThreadPool::checkConnection(unsigned long ipAddr)
+int ThreadPool::checkConnection(unsigned long ipAddr,unsigned int port)
 {
     buffMutex.lock();
     for(int i=0;i<threadBuff.length();i++)
     {
         /* 查找重复连接 */
-        if(threadBuff.at(i)->getIpAddr()==ipAddr)
+        if(threadBuff.at(i)->getIpAddr()==ipAddr&&threadBuff.at(i)->getConnFd()==port)
         {
             buffMutex.unlock();
             return i;
