@@ -135,17 +135,10 @@ void MainWindow::on_actionConditionQuery_triggered()
         connect(controller,&Controller::sendQueryFailed,this,[this](){
             this->displayInfo("航班查询异常！！");
         });
-        connect(controller,&Controller::sendQuerySuccess,this,[this](){
-            this->displayInfo("查询成功...\n");
+        connect(controller,&Controller::sendQuerySuccess,this,[this](int x,int y,int z,int m){
+            this->displayInfo(QString("查询到航班:%1 数量%2 价格%2").arg(y,z,m));
         });
 
-//        if(message.msg_type==INQUIRE_SUCCEED){
-//            sprintf(msg,"查询成功！航班号：%d, 剩余票数：%d, 票价：%d\n",message.flight_ID,message.ticket_num, message.ticket_total_price);
-//        }
-//        else{
-//            sprintf(msg,"查询失败！航班号：%d, 剩余票数：未知\n",message.flight_ID);
-//        }
-//        display_info(msg);
     }
 }
 
@@ -162,28 +155,9 @@ void MainWindow::on_actionAllQuery_triggered()
     connect(controller,&Controller::sendQueryAllFailed,this,[this](){
         this->displayInfo("查询所有航班信息异常！！");
     });
-    connect(controller,&Controller::sendQueryAllSuccess,this,[this](){
-        this->displayInfo("查询所有航班成功...\n");
+    connect(controller,&Controller::sendQueryAllSuccess,this,[this](int x,int y,int z,int m){
+        this->displayInfo(QString("查询到航班:%d 数量%d 价格%d").arg(y,z,m));
     });
-//    if(ret==-1) {
-//        display_info("接收失败！请重新发送！") ;
-//        return ;
-//    }
-//    pos=0;
-//    sprintf(msg,"查询所有航班结果：\n");
-//    display_info(msg);
-//    for (i=0;i<ret;i=i+sizeof(message)) {
-//        memcpy(&message,recv_buf+pos,sizeof(message));
-//        if(message.msg_type==INQUIRE_SUCCEED){
-//            sprintf(msg,"查询成功！航班号：%d, 剩余票数：%d, 票价：%d",message.flight_ID,message.ticket_num, message.ticket_total_price);
-//        }
-//        else{
-//            sprintf(msg,"查询失败！航班号：%d, 剩余票数：未知",message.flight_ID);
-//        }
-//        display_info(msg);
-//        pos+=sizeof(message);
-//    }
-//    display_info("\n");
 }
 
 void MainWindow::on_actionShow_triggered()

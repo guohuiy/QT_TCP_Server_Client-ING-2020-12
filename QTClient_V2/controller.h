@@ -25,12 +25,12 @@ private:
     QTcpSocket* client;
     bool connectflag;
 signals:
-    void sendBuySuccess();
-    void sendBuyFailure();
-    void sendQuerySuccess();
-    void sendQueryFailed();
-    void sendQueryAllSuccess();
-    void sendQueryAllFailed();
+    void sendBuySuccess(unsigned int msgType,unsigned int flightID,unsigned int ticketNum,unsigned int ticketTotalPrice);
+    void sendBuyFailure(unsigned int msgType,unsigned int flightID,unsigned int ticketNum,unsigned int ticketTotalPrice);
+    void sendQuerySuccess(unsigned int msgType,unsigned int flightID,unsigned int ticketNum,unsigned int ticketTotalPrice);
+    void sendQueryFailed(unsigned int msgType,unsigned int flightID,unsigned int ticketNum,unsigned int ticketTotalPrice);
+    void sendQueryAllSuccess(unsigned int msgType,unsigned int flightID,unsigned int ticketNum,unsigned int ticketTotalPrice);
+    void sendQueryAllFailed(unsigned int msgType,unsigned int flightID,unsigned int ticketNum,unsigned int ticketTotalPrice);
 };
 
 #endif // CONTROLLER_H

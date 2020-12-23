@@ -33,11 +33,15 @@ void Controller::isConnect()
 void Controller::disconnectServer()
 {
     client->disconnectFromHost();
+    QByteArray bArr;
+    QDataStream in(&bArr,QIODevice::ReadWrite);
+    in.setVersion(QDataStream::Qt_5_12);
+    in<<DISCONNECT<<0<<0<<0;
 }
 
 void Controller::exitServer()
 {
-    client->abort();
+    disconnectServer();
 }
 
 int Controller::buyTicket(unsigned int flightID,unsigned int ticketNum)
@@ -55,7 +59,7 @@ int Controller::buyTicket(unsigned int flightID,unsigned int ticketNum)
     //in<<(quint64)0;
     in<<message.getMsgType()<<message.getFlightID()<<message.getTicketNum()<<message.getTicketTotalPrice();
     //in.device()->seek(0);
-    in<<(quint64)(bArr.size()-sizeof (quint64));
+    //in<<(quint64)(bArr.size()-sizeof (quint64));
     qDebug()<<bArr;
 
     return client->write(bArr);
@@ -63,40 +67,41 @@ int Controller::buyTicket(unsigned int flightID,unsigned int ticketNum)
 
 void Controller::receiveMsg()
 {
-    char buff[1024]{0};
-    client->read(buff,sizeof buff);
-    QByteArray bArr(buff);
-    QDataStream out(bArr);
-    unsigned int msgType=INITIAL_VALUE;
-    out>>msgType;
-    if(msgType==BUY_SUCCEED) emit sendBuySuccess();
-    else if(msgType==INQUIRE_SUCCEED) emit sendQuerySuccess();
-    else if(msgType==BUY_FAILED) emit sendBuyFailure();
-    else if(msgType==INQUIRE_FAILED) emit sendQueryFailed();
-    else if(msgType==INQUIRE_ALL_FAILED) emit sendQueryAllFailed();
-    else if(msgType==INQUIRE_ALL_SUCCEED) emit sendQueryAllSuccess();
+    unsigned int msgType;
+    unsigned int flightID;
+    unsigned int ticketNum;
+    unsigned int ticketTotalPrice;
+    QDataStream in(client);
+    in.setVersion(QDataStream::Qt_5_12);
+
+    in >> msgType>>flightID>>ticketNum>>ticketTotalPrice;
+    qDebug()<<msgType,flightID,ticketNum,ticketTotalPrice;
+    if(msgType==BUY_SUCCEED) emit sendBuySuccess(msgType,flightID,ticketNum,ticketTotalPrice);
+    else if(msgType==INQUIRE_SUCCEED) emit sendQuerySuccess(msgType,flightID,ticketNum,ticketTotalPrice);
+    else if(msgType==BUY_FAILED) emit sendBuyFailure(msgType,flightID,ticketNum,ticketTotalPrice);
+    else if(msgType==INQUIRE_FAILED) emit sendQueryFailed(msgType,flightID,ticketNum,ticketTotalPrice);
+    else if(msgType==INQUIRE_ALL_FAILED) emit sendQueryAllFailed(msgType,flightID,ticketNum,ticketTotalPrice);
+    else if(msgType==INQUIRE_ALL_SUCCEED) emit sendQueryAllSuccess(msgType,flightID,ticketNum,ticketTotalPrice);
 
 }
 
 int Controller::conditionQuery(unsigned int flightID)
 {
-    char buff[1024]{0};
-    client->read(buff,sizeof buff);
-    QByteArray bArr(buff);
-    QDataStream in(bArr);
+    QByteArray bArr;
+    QDataStream in(&bArr,QIODevice::ReadWrite);
+    in.setVersion(QDataStream::Qt_5_12);
     in<<INQUIRE_ONE<<flightID<<0<<0;
-
-    return client->write(buff);
+    //in<<(quint64)(bArr.size()-sizeof (quint64));
+    return client->write(bArr);
 }
 
 int Controller::allQuery()
 {
-    char buff[1024]{0};
-    client->read(buff,sizeof buff);
-    QByteArray bArr(buff);
-    QDataStream in(bArr);
+    QByteArray bArr;
+    QDataStream in(&bArr,QIODevice::ReadWrite);
+    in.setVersion(QDataStream::Qt_5_12);
     in<<INQUIRE_ALL<<0<<0<<0;
 
-    return client->write(buff);
+    return client->write(bArr);
 }
 

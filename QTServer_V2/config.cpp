@@ -46,7 +46,11 @@ void Config::saveConfig()
     set->setValue("BUY_SUCCEED",255);
     set->setValue("BUY_FAILED",256);
     set->setValue("INQUIRE_SUCCEED",257);
-    set->setValue("UNKNOWN_CODE",258);
+    set->setValue("INQUIRE_SUCCEED",258);
+    set->setValue("UNKNOWN_CODE",259);
+    set->setValue("INQUIRE_ALL_SUCCEED",260);
+    set->setValue("INQUIRE_ALL_FAILED",261);
+
 
 }
 

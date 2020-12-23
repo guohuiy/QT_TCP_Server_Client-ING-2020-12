@@ -99,11 +99,13 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket *client,InfoProcess *infoProce
                                                                          message.getTicketTotalPrice());
 
                 infoProcess->addInfo(msg);
-                msg=QString::number(message.getMsgType())+
-                     QString::number(message.getFlightID())+
-                     QString::number(message.getTicketNum())+
-                     QString::number(message.getTicketTotalPrice());
-                msgRet=client->write(msg.toStdString().c_str(),strlen(msg.toStdString().c_str()));
+
+                QByteArray bArr;
+                QDataStream in(&bArr,QIODevice::ReadWrite);
+                in.setVersion(QDataStream::Qt_5_12);
+                in<<message.getMsgType()<<message.getFlightID()<<message.getTicketNum()<<message.getTicketTotalPrice();
+                in<<(quint64)(bArr.size()-sizeof (quint64));
+                msgType= client->write(bArr);
 
                 if(msgRet<0)
                 {
@@ -119,11 +121,12 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket *client,InfoProcess *infoProce
                                                                          message.getTicketTotalPrice());
 
                 infoProcess->addInfo(msg);
-                msg=QString::number(message.getMsgType())+
-                     QString::number(message.getFlightID())+
-                     QString::number(message.getTicketNum())+
-                     QString::number(message.getTicketTotalPrice());
-                msgRet=client->write(msg.toStdString().c_str(),strlen(msg.toStdString().c_str()));
+                QByteArray bArr;
+                QDataStream in(&bArr,QIODevice::ReadWrite);
+                in.setVersion(QDataStream::Qt_5_12);
+                in<<message.getMsgType()<<message.getFlightID()<<message.getTicketNum()<<message.getTicketTotalPrice();
+                in<<(quint64)(bArr.size()-sizeof (quint64));
+                msgType= client->write(bArr);
 
                 if(msgRet<0)
                 {
@@ -136,7 +139,7 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket *client,InfoProcess *infoProce
 
         case INQUIRE_ONE:
         {
-        qDebug()<<"dealNewClientMsg::INQUIRE_ONE";
+            qDebug()<<"dealNewClientMsg::INQUIRE_ONE";
             ticketOp->readTicketList();
 
             if(ticketOp->searchFlightIdInfoToMessage(message.getFlightID(),message))
@@ -144,12 +147,31 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket *client,InfoProcess *infoProce
                 message.setMsgType(INQUIRE_SUCCEED);
                 msg=QString("客户端 %s 查询航班号：%d 成功！\n").arg(client->peerAddress().toString()).arg(message.getFlightID());
                 infoProcess->addInfo(msg);
-                msg=QString::number(message.getMsgType())+
-                     QString::number(message.getFlightID())+
-                     QString::number(message.getTicketNum())+
-                     QString::number(message.getTicketTotalPrice());
-                msgRet=client->write(msg.toStdString().c_str(),strlen(msg.toStdString().c_str()));
 
+                QByteArray bArr;
+                QDataStream in(&bArr,QIODevice::ReadWrite);
+                in.setVersion(QDataStream::Qt_5_12);
+                in<<message.getMsgType()<<message.getFlightID()<<message.getTicketNum()<<message.getTicketTotalPrice();
+                in<<(quint64)(bArr.size()-sizeof (quint64));
+                msgType= client->write(bArr);
+
+                if(msgRet<0)
+                {
+                    emit sendThreadErr("查询发送数据出错\n", this->getTid());
+                }
+            }
+            else
+            {
+                message.setMsgType(INQUIRE_FAILED);
+                msg=QString("客户端 %s 查询航班号：%d 异常！\n").arg(client->peerAddress().toString()).arg(message.getFlightID());
+                infoProcess->addInfo(msg);
+
+                QByteArray bArr;
+                QDataStream in(&bArr,QIODevice::ReadWrite);
+                in.setVersion(QDataStream::Qt_5_12);
+                in<<message.getMsgType()<<message.getFlightID()<<0<<0;
+                in<<(quint64)(bArr.size()-sizeof (quint64));
+                msgType= client->write(bArr);
                 if(msgRet<0)
                 {
                     emit sendThreadErr("查询发送数据出错\n", this->getTid());
@@ -161,20 +183,21 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket *client,InfoProcess *infoProce
         case INQUIRE_ALL:
         {
         qDebug()<<"dealNewClientMsg::INQUIRE_ALL";
-            ticketOp->readTicketList();
             QVector<Message*> vMsg;
             if(ticketOp->searchAllFlight(vMsg))
             {
-                msg=QString("客户端 %s 查询所有航班号成功！\n").arg(client->peerAddress().toString());
+                msg=QString("客户端 %1 查询所有航班号成功！\n").arg(client->peerAddress().toIPv4Address());
                 infoProcess->addInfo(msg);
 
                 foreach(Message* m,vMsg)
                 {
-                    msg=QString::number(m->getMsgType())+
-                         QString::number(m->getFlightID())+
-                         QString::number(m->getTicketNum())+
-                         QString::number(m->getTicketTotalPrice());
-                    msgRet=client->write(msg.toStdString().c_str(),strlen(msg.toStdString().c_str()));
+                    m->setMsgType(INQUIRE_ALL_SUCCEED);
+                    QByteArray bArr;
+                    QDataStream in(&bArr,QIODevice::ReadWrite);
+                    in.setVersion(QDataStream::Qt_5_12);
+                    in<<m->getMsgType()<<m->getFlightID()<<m->getTicketNum()<<m->getTicketTotalPrice();
+
+                    msgType= client->write(bArr);
                     delete m;
                     if(msgRet<0)
                     {
@@ -186,10 +209,21 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket *client,InfoProcess *infoProce
             {
                 msg=QString("客户端 %s 查询所有航班号异常！\n").arg(client->peerAddress().toString());
                 infoProcess->addInfo(msg);
+                message.setMsgType(INQUIRE_ALL_FAILED);
+                QByteArray bArr;
+                QDataStream in(&bArr,QIODevice::ReadWrite);
+                in.setVersion(QDataStream::Qt_5_12);
+                in<<message.getMsgType()<<0<<0<<0;
+                in<<(quint64)(bArr.size()-sizeof (quint64));
+                msgType= client->write(bArr);
+                if(msgRet<0)
+                {
+                    emit sendThreadErr("查询发送数据出错\n", this->getTid());
+                }
             }
             break;
         }
-        case ADD_TICKET:
+        case ADD_TICKET://管理员操作
         qDebug()<<"dealNewClientMsg::ADD_TICKET";
             ticketOp->readTicketList();
             if(ticketOp->updateDatabase(QString("insert into ticket values(%d, %d, %d)").arg(message.getFlightID(),message.getTicketNum(),message.getTicketTotalPrice())))
@@ -204,7 +238,7 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket *client,InfoProcess *infoProce
             }
             break;
 
-        case UPDATE_TICKET:
+        case UPDATE_TICKET://管理员操作
         qDebug()<<"dealNewClientMsg::UPDATE_TICKET";
             ticketOp->readTicketList();
             if(ticketOp->updateDatabase(QString("update ticket set ticketPrice = %d where flightID = %d").arg(message.getTicketTotalPrice(),message.getFlightID())))
@@ -219,7 +253,7 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket *client,InfoProcess *infoProce
             }
             break;
 
-        case DELETE_TICKET:
+        case DELETE_TICKET://管理员操作
             ticketOp->readTicketList();
             if(ticketOp->updateDatabase(QString("delete from ticket where flightID = %d").arg(message.getFlightID())))
             {
@@ -236,17 +270,23 @@ void ThreadOperation::dealNewClientMsg(QTcpSocket *client,InfoProcess *infoProce
 
         default:
             message.setMsgType(UNKNOWN_CODE);
-            msg=QString::number(message.getMsgType())+
-                 QString::number(message.getFlightID())+
-                 QString::number(message.getTicketNum())+
-                 QString::number(message.getTicketTotalPrice());
-            msgRet=client->write(msg.toStdString().c_str(),strlen(msg.toStdString().c_str()));
-
+            QByteArray bArr;
+            QDataStream in(&bArr,QIODevice::ReadWrite);
+            in.setVersion(QDataStream::Qt_5_12);
+            in<<message.getMsgType()<<0<<0<<0;
+            in<<(quint64)(bArr.size()-sizeof (quint64));
+            msgType=client->write(bArr);
             if(msgRet<0)
             {
-                emit sendThreadErr("发送数据出错\n", this->getTid());
+                emit sendThreadErr("查询发送数据出错\n", this->getTid());
             }
+
     }
+
+}
+
+void ThreadOperation::writeErr(unsigned int errMsg)
+{
 
 }
 

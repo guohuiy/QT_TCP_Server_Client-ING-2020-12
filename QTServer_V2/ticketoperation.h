@@ -41,6 +41,7 @@ private:
     const QString username="username";
     const QString password="password";
     const QString mydatabase="database";
+
     Config* config;
     int numRows;
 

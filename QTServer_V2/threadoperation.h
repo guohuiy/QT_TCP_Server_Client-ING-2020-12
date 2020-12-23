@@ -17,6 +17,7 @@ public:
     ~ThreadOperation();
 
     void dealNewClientMsg(QTcpSocket *client,InfoProcess *infoProcess,TicketOperation *ticketOp);
+    void writeErr(unsigned int errMsg);
     int getTid() const;
     void setTid(int value);
 

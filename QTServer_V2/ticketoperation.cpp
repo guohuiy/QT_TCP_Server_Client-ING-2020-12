@@ -193,7 +193,7 @@ bool TicketOperation::searchFlightIdInfoToMessage(unsigned int flightID, Message
     this->readTicketList();
 
     dataBaseMutex.lock();
-    for(int i=0;i<numRows;i++)
+    for(int i=0;i<ticketList.length();i++)
     {
         if(ticketList.at(i)->getFlightId()==flightID)
         {
@@ -214,9 +214,10 @@ bool TicketOperation::searchAllFlight(QVector<Message*> &vMsg)
     this->readTicketList();
 
     dataBaseMutex.lock();
-    for(int i=0;i<numRows;i++)
+    for(int i=0;i<ticketList.length();i++)
     {
-        vMsg.push_back(new Message(config->readConfig("INQUIRE_SUCCEED").toInt(),ticketList.at(i)->getFlightId(),ticketList.at(i)->getTicketNum(),ticketList.at(i)->getTicketPrice()));
+        qDebug()<<"TicketOperation::searchAllFlight:::"<<config->readConfig("INQUIRE_ALL_SUCCEED").toInt();
+        vMsg.push_back(new Message(config->readConfig("INQUIRE_ALL_SUCCEED").toInt(),ticketList.at(i)->getFlightId(),ticketList.at(i)->getTicketNum(),ticketList.at(i)->getTicketPrice()));
     }
     if(vMsg.length()==numRows)
     {
