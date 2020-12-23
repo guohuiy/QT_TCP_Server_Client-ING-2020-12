@@ -94,8 +94,11 @@ void MainWindow::on_actionBuyTicket_triggered()
         connect(controller,&Controller::sendBuyFailure,this,[this](){
             this->displayInfo("购票异常...\n");
         });
-        connect(controller,&Controller::sendBuySuccess,this,[this](){
-            this->displayInfo("购票成功...\n");
+        connect(controller,&Controller::sendBuySuccess,this,[this](int x,int y,int z, int k){
+            this->displayInfo(QString("航班%1:购票成功，总票价：%2...\n").arg(y).arg(k));
+        });
+        connect(controller,&Controller::sendErr,this,[this](){
+            this->displayInfo("数据异常...\n");
         });
     }
 }
@@ -136,9 +139,11 @@ void MainWindow::on_actionConditionQuery_triggered()
             this->displayInfo("航班查询异常！！");
         });
         connect(controller,&Controller::sendQuerySuccess,this,[this](int x,int y,int z,int m){
-            this->displayInfo(QString("查询到航班:%1 数量%2 价格%2").arg(y,z,m));
+            this->displayInfo(QString("查询到航班:%1 数量%2 价格%3").arg(y).arg(z).arg(m));
         });
-
+        connect(controller,&Controller::sendErr,this,[this](){
+            this->displayInfo("数据异常...\n");
+        });
     }
 }
 
@@ -156,7 +161,10 @@ void MainWindow::on_actionAllQuery_triggered()
         this->displayInfo("查询所有航班信息异常！！");
     });
     connect(controller,&Controller::sendQueryAllSuccess,this,[this](int x,int y,int z,int m){
-        this->displayInfo(QString("查询到航班:%d 数量%d 价格%d").arg(y,z,m));
+        this->displayInfo(QString("查询到航班:%1 数量%2 价格%3").arg(y).arg(z).arg(m));
+    });
+    connect(controller,&Controller::sendErr,this,[this](){
+        this->displayInfo("数据异常...\n");
     });
 }
 
@@ -177,7 +185,7 @@ void MainWindow::on_actionShow_triggered()
     QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
     if (dialog.exec() == QDialog::Accepted)
     {
-        displayInfo("查询信息成功\n");
+        displayInfo("查询帮助显示信息成功\n");
     }
 }
 
@@ -197,6 +205,6 @@ void MainWindow::on_actionAbout_triggered()
     QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
     if (dialog.exec() == QDialog::Accepted)
     {
-        this->displayInfo("查询信息成功\n");
+        this->displayInfo("查询帮助关于信息成功\n");
     }
 }

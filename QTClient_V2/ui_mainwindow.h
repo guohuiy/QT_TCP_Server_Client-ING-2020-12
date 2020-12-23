@@ -34,13 +34,15 @@ public:
     QAction *actionAllQuery;
     QAction *actionShow;
     QAction *actionAbout;
+    QAction *action;
     QWidget *centralwidget;
     QTextBrowser *textBrowser;
     QLabel *label;
     QMenuBar *menubar;
     QMenu *menu;
-    QMenu *menu_2;
-    QMenu *menu_3;
+    QMenu *menuQuery;
+    QMenu *menuHelp;
+    QMenu *menuOperation;
     QStatusBar *statusBar;
     QToolBar *toolBar;
 
@@ -81,6 +83,8 @@ public:
         actionShow->setObjectName(QString::fromUtf8("actionShow"));
         actionAbout = new QAction(MainWindow);
         actionAbout->setObjectName(QString::fromUtf8("actionAbout"));
+        action = new QAction(MainWindow);
+        action->setObjectName(QString::fromUtf8("action"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         textBrowser = new QTextBrowser(centralwidget);
@@ -95,10 +99,12 @@ public:
         menubar->setGeometry(QRect(0, 0, 781, 26));
         menu = new QMenu(menubar);
         menu->setObjectName(QString::fromUtf8("menu"));
-        menu_2 = new QMenu(menubar);
-        menu_2->setObjectName(QString::fromUtf8("menu_2"));
-        menu_3 = new QMenu(menubar);
-        menu_3->setObjectName(QString::fromUtf8("menu_3"));
+        menuQuery = new QMenu(menubar);
+        menuQuery->setObjectName(QString::fromUtf8("menuQuery"));
+        menuHelp = new QMenu(menubar);
+        menuHelp->setObjectName(QString::fromUtf8("menuHelp"));
+        menuOperation = new QMenu(menubar);
+        menuOperation->setObjectName(QString::fromUtf8("menuOperation"));
         MainWindow->setMenuBar(menubar);
         statusBar = new QStatusBar(MainWindow);
         statusBar->setObjectName(QString::fromUtf8("statusBar"));
@@ -108,21 +114,23 @@ public:
         MainWindow->addToolBar(Qt::TopToolBarArea, toolBar);
 
         menubar->addAction(menu->menuAction());
-        menubar->addAction(menu_2->menuAction());
-        menubar->addAction(menu_3->menuAction());
+        menubar->addAction(menuQuery->menuAction());
+        menubar->addAction(menuOperation->menuAction());
+        menubar->addAction(menuHelp->menuAction());
         menu->addAction(actionConnect);
         menu->addAction(actionDisconnct);
-        menu->addAction(actionBuyTicket);
         menu->addAction(actionExit);
-        menu_2->addAction(actionConditionQuery);
-        menu_2->addAction(actionAllQuery);
-        menu_3->addAction(actionShow);
-        menu_3->addAction(actionAbout);
-        toolBar->addAction(actionBuyTicket);
-        toolBar->addAction(actionExit);
-        toolBar->addAction(actionConditionQuery);
+        menuQuery->addAction(actionConditionQuery);
+        menuQuery->addAction(actionAllQuery);
+        menuHelp->addAction(actionShow);
+        menuHelp->addAction(actionAbout);
+        menuOperation->addAction(actionBuyTicket);
         toolBar->addAction(actionConnect);
         toolBar->addAction(actionDisconnct);
+        toolBar->addAction(actionExit);
+        toolBar->addAction(actionConditionQuery);
+        toolBar->addAction(actionAllQuery);
+        toolBar->addAction(actionBuyTicket);
 
         retranslateUi(MainWindow);
 
@@ -140,10 +148,12 @@ public:
         actionAllQuery->setText(QApplication::translate("MainWindow", "\346\237\245\350\257\242\346\211\200\346\234\211\350\210\252\347\217\255", nullptr));
         actionShow->setText(QApplication::translate("MainWindow", "\346\230\276\347\244\272\345\206\205\345\256\271", nullptr));
         actionAbout->setText(QApplication::translate("MainWindow", "\345\205\263\344\272\216", nullptr));
+        action->setText(QApplication::translate("MainWindow", "\350\264\255\344\271\260\346\234\272\347\245\250", nullptr));
         label->setText(QApplication::translate("MainWindow", "\345\256\242\346\210\267\347\253\257\344\277\241\346\201\257\357\274\232", nullptr));
         menu->setTitle(QApplication::translate("MainWindow", "\345\256\242\346\210\267\347\253\257\346\223\215\344\275\234", nullptr));
-        menu_2->setTitle(QApplication::translate("MainWindow", "\346\234\272\347\245\250\346\237\245\350\257\242", nullptr));
-        menu_3->setTitle(QApplication::translate("MainWindow", "\345\270\256\345\212\251", nullptr));
+        menuQuery->setTitle(QApplication::translate("MainWindow", "\346\234\272\347\245\250\346\237\245\350\257\242", nullptr));
+        menuHelp->setTitle(QApplication::translate("MainWindow", "\345\270\256\345\212\251", nullptr));
+        menuOperation->setTitle(QApplication::translate("MainWindow", "\346\234\272\347\245\250\350\264\255\344\271\260", nullptr));
         toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar", nullptr));
     } // retranslateUi
 

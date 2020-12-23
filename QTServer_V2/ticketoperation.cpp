@@ -166,6 +166,7 @@ bool TicketOperation::ticketInfoList(QList<QString> &tL)
     return true;
 }
 
+
 bool TicketOperation::searchFlightIdInfoToString(unsigned int flightID, QString &msg)
 {
     if(flightID<=0 )return false;
@@ -230,7 +231,7 @@ bool TicketOperation::searchAllFlight(QVector<Message*> &vMsg)
 
 bool TicketOperation::buyTicket(Message& msg)
 {
-    if(msg.getFlightID()<=0 || msg.getFlightID()>(unsigned int)numRows)return false;
+    if(msg.getFlightID()<=0)return false;
 
     dataBaseMutex.lock();
     for(int i=0;i<numRows;i++)
@@ -241,10 +242,10 @@ bool TicketOperation::buyTicket(Message& msg)
             {
                 //满足条件，出票
                 msg.setMsgType(config->readConfig("BUY_SUCCEED").toInt());
-                msg.setTicketTotalPrice(msg.getTicketNum()*ticketList.at(i)->getTicketPrice());
+                msg.setTicketTotalPrice(msg.getTicketNum()*(ticketList.at(i)->getTicketPrice()));
                 ticketList.at(i)->setTicketNum(ticketList.at(i)->getTicketNum()-msg.getTicketNum());
                 //刷新数据库
-                this->updateDatabase(QString("update ticket set ticketNum = %d where flightID = %d").arg(ticketList.at(i)->getTicketNum(),ticketList.at(i)->getFlightId()));
+                this->updateDatabase(QString("update ticket set ticketNum = %1 where flightID = %2").arg(ticketList.at(i)->getTicketNum()).arg(ticketList.at(i)->getFlightId()));
                 dataBaseMutex.unlock();
                 return true;
             }
@@ -259,6 +260,12 @@ bool TicketOperation::buyTicket(Message& msg)
 
 int TicketOperation::getNumRows()
 {
+    readTicketList();
     return numRows;
+}
+
+QList<Ticket *> TicketOperation::getTicketList() const
+{
+    return ticketList;
 }
 

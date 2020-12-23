@@ -14,6 +14,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     service=new ThreadService(this);
     this->enableButton(false);
+
+//    connect(service,&ThreadService::dealNewOverMsg,this,[this](QString msg){
+//        this->displayInfo(msg);
+//    });
 }
 
 MainWindow::~MainWindow()
@@ -51,10 +55,12 @@ void MainWindow::on_actionStart_triggered()
     displayInfo("服务器正在开启...");
 
     //开启监听
-    if(service->listenThread())
-        this->displayInfo("服务器开启成功...\n");
-    else
-        this->displayInfo("服务器开启异常...\n");
+    service->listenThread();
+    this->displayInfo("服务器开启成功...\n");
+//    if(service->listenThread())
+//        this->displayInfo("服务器开启成功...\n");
+//    else
+//        this->displayInfo("服务器开启异常...\n");
     enableButton(true);
 }
 

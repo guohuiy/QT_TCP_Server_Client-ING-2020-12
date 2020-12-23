@@ -31,6 +31,7 @@ signals:
     void sendQueryFailed(unsigned int msgType,unsigned int flightID,unsigned int ticketNum,unsigned int ticketTotalPrice);
     void sendQueryAllSuccess(unsigned int msgType,unsigned int flightID,unsigned int ticketNum,unsigned int ticketTotalPrice);
     void sendQueryAllFailed(unsigned int msgType,unsigned int flightID,unsigned int ticketNum,unsigned int ticketTotalPrice);
+    void sendErr();
 };
 
 #endif // CONTROLLER_H

@@ -17,6 +17,7 @@ public:
     ~ThreadOperation();
 
     void dealNewClientMsg(QTcpSocket *client,InfoProcess *infoProcess,TicketOperation *ticketOp);
+    void listenThread();
     void writeErr(unsigned int errMsg);
     int getTid() const;
     void setTid(int value);
@@ -27,14 +28,20 @@ public:
     int getConnFd() const;
     void setConnFd(int value);
 
+    void setMyClient(QTcpSocket *value);
+
 private:
     Config* config;
-    bool start;
+    QTcpServer* myServer;
+    QTcpSocket* myClient;
+    Message *message;
+
     int tid;            // 保存对应线程的线程号
     unsigned long ipAddr;  // 保存对应的客户机的IP地址
     int	connFd;        // 该线程使用的连接套接字描述符
 signals:
-    void sendThreadErr(QString s, int tid);
+    void sendOver(QString msg);
+    void reciveMessage(QTcpSocket* client, Message *message,int tid);
 };
 
 #endif // THREADOPERATION_H

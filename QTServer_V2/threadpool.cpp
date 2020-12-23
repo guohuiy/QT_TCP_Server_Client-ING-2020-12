@@ -115,12 +115,13 @@ ThreadOperation *ThreadPool::searchThread(unsigned int ipAddr, int port)
 
 ThreadOperation *ThreadPool::searchThread(int pos)
 {
-    if(pos<0 || pos>=threadBuff.length()) return nullptr;
-    return threadBuff.at(pos);
+    if(pos<0 && pos>=threadBuff.length())return nullptr;
+    else return threadBuff.at(pos);
 }
 
 QThread *ThreadPool::searchQThread(int pos)
 {
-    if(pos<0 || pos>=qThreadList.length()) return nullptr;
-    return qThreadList.at(pos);
+    if(pos<0 && pos>=qThreadList.length())return nullptr;
+    else return qThreadList.at(pos);
+
 }

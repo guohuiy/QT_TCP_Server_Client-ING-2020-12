@@ -25,7 +25,6 @@ public:
     bool openDatabase(QSqlDatabase &db);
     void closeDatabase(QSqlDatabase &db);
 
-    /* readTicketList:初始化ticketList数组 */
     void readTicketList();
     bool ticketInfoList(QList<QString>& tL);
     bool searchFlightIdInfoToString(unsigned int flightID,QString &msg);
@@ -34,7 +33,8 @@ public:
     bool buyTicket(Message &msg);
 
     int getNumRows();
-    void setNumRows(int numRows);
+    QList<Ticket *> getTicketList() const;
+
 private:
     const QString database="base";
     const QString hostname="hostname";
